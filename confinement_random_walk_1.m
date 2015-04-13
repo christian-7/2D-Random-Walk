@@ -1,7 +1,7 @@
 clear all, clc, close all
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+% test
 D=1e-3;                     % diffusion constant, ?m2/s             
 t=1:1:1000;                 % number od time steps, seconds        
 R=0.3;                      % radius of the confinement zone, ?m
