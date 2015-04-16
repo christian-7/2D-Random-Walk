@@ -154,9 +154,11 @@ s3=smooth(L(:,2)*dt, L(:,1),0.05,'loess');
 figure('Position',[200 20 900 300])
 
 subplot(1,3,1)
-plot(D*prob2(:,1)*dt,prob2(:,2));hold on;
-plot(D*prob2(:,1)*dt,s1,'-r');
-xlabel('Dt/R^2','FontSize',12);
+% plot(D*prob2(:,1)*dt,prob2(:,2));hold on;
+% plot(D*prob2(:,1)*dt,s1,'-r');
+plot(prob2(:,1)*dt,prob2(:,2));hold on;
+plot(prob2(:,1)*dt,s1,'-r');
+xlabel('time (s)','FontSize',12);
 ylabel('mean log(\psi)','FontSize',12);
 
 subplot(1,3,2)

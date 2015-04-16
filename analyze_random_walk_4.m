@@ -5,7 +5,7 @@ clear all, clc, close all
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 start=[1 1];            % starting coordinates
-num_steps=800;         % number of steps
+num_steps=800;          % number of steps
 D=1e-3;                 % diffusion constant ?m2/s             
 
 
@@ -15,7 +15,8 @@ step_size=sqrt(4*D*dt);     % D=(dx^2)/dt --> in ?m
 % step_size=sqrt(D/dt);
 
 figure('Position',[200 400 900 650])
-
+h=gcf;
+set(h,'PaperOrientation','landscape');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Calculate random walk
 
@@ -49,6 +50,8 @@ title('XY scatter trajectory');
 xlabel('x (\mu m)', 'FontSize',12);
 ylabel('y (\mu m)', 'FontSize',12);
 
+c=colorbar%('northoutside');
+
 
 %% Plot displacement from origin
 
@@ -77,66 +80,66 @@ title('Cumulative Distance from Origin', 'FontSize',12);
 xlabel('time (s)', 'FontSize',12);
 ylabel('cumulative distance from origin (\mu m)', 'FontSize',12);
 
-%% Calculate MSD (from Nathanael)
-
-tab(:,1)=pos(:,3); %1:1:length(pos);
-tab(:,2)=pos(:,1);
-tab(:,3)=pos(:,2);
-X=tab(:,2:3);
-
-% dx=0.1;     % pixel size
-% dt=0.5;       % time step
-
-% X=data(:,2:3);
-
-frame=tab(:,1);
-frame=frame-min(frame);           % if it does not start with 0
-% frame=frame/dt;                 % frame in sec
-N=(max(frame)-min(frame)+1);      % number of frames
-
-msd=zeros(1,N);
-Time = [0:N-1]*dt;
-f=zeros(1,N);
-
-
-% Find the frames that have been recorded
-
-for j=0:N
-    if ~isempty(find(frame==j))
-        f(j+1)=find(frame==j,1);
-    end
-end
-
-
-
-for i=1:N-1
-    c=0;
-    
-    for j=0:N-i-1
-        if f(i+j+1)>0 && f(j+1)>0
-            c=c+1;
-            msd(i+1)=msd(i+1)+ sum((X(f(i+j+1),:)-X(f(j+1),:)).^2 );
-        end
-    end
-    if c>0
-        msd(i+1)=msd(i+1)/c;
-    end
-end
-
-
-% msd=msd*dx^2%/dt;
-
-subplot(2,3,2)
-scatter(Time,msd);hold on;
-title('Mean square displacement');
-xlabel('time step', 'FontSize',12);
-ylabel('MSD (\mu m^2)', 'FontSize',12);
-%axis([0 50 0 5]);
-% legend('Nathanael');
-% set(leg2,'FontSize',12);
-hold on;
-
-% clear dt;
+% %% Calculate MSD (from Nathanael)
+% 
+% tab(:,1)=pos(:,3); %1:1:length(pos);
+% tab(:,2)=pos(:,1);
+% tab(:,3)=pos(:,2);
+% X=tab(:,2:3);
+% 
+% % dx=0.1;     % pixel size
+% % dt=0.5;       % time step
+% 
+% % X=data(:,2:3);
+% 
+% frame=tab(:,1);
+% frame=frame-min(frame);           % if it does not start with 0
+% % frame=frame/dt;                 % frame in sec
+% N=(max(frame)-min(frame)+1);      % number of frames
+% 
+% msd=zeros(1,N);
+% Time = [0:N-1]*dt;
+% f=zeros(1,N);
+% 
+% 
+% % Find the frames that have been recorded
+% 
+% for j=0:N
+%     if ~isempty(find(frame==j))
+%         f(j+1)=find(frame==j,1);
+%     end
+% end
+% 
+% 
+% 
+% for i=1:N-1
+%     c=0;
+%     
+%     for j=0:N-i-1
+%         if f(i+j+1)>0 && f(j+1)>0
+%             c=c+1;
+%             msd(i+1)=msd(i+1)+ sum((X(f(i+j+1),:)-X(f(j+1),:)).^2 );
+%         end
+%     end
+%     if c>0
+%         msd(i+1)=msd(i+1)/c;
+%     end
+% end
+% 
+% 
+% % msd=msd*dx^2%/dt;
+% 
+% subplot(2,3,2)
+% scatter(Time,msd);hold on;
+% title('Mean square displacement');
+% xlabel('time step', 'FontSize',12);
+% ylabel('MSD (\mu m^2)', 'FontSize',12);
+% %axis([0 50 0 5]);
+% % legend('Nathanael');
+% % set(leg2,'FontSize',12);
+% hold on;
+% 
+% % clear dt;
 
 %% My MSD
 
@@ -213,14 +216,14 @@ subplot(2,3,3)
 scatter(pos(:,3),vel,3,pos(:,3));
 title('Velocity');
 xlabel('time (s)');
-ylabel('velocity (?m/s)');
+ylabel('velocity (\mu m/s)');
 
 
 subplot(2,3,6)
 hist(vel,20)
 title('Histogram of Velocity');
-xlabel('time (s)', 'FontSize',12);
-ylabel('velocity (\mu m/s)', 'FontSize',12);
+xlabel('velocity (\mu m/s)', 'FontSize',12);
+ylabel('count', 'FontSize',12);
 
 %% Calculate confinement
 
@@ -311,6 +314,8 @@ s3=smooth(L(:,2)*dt, L(:,1),0.05,'loess');
 
 
 figure('Position',[200 20 900 300])
+h=gcf;
+set(h,'PaperOrientation','landscape');
 
 subplot(1,3,1)
 plot(D*prob2(:,1)*dt,prob2(:,2));hold on;
@@ -334,6 +339,9 @@ ylabel('probability level L','FontSize',12);
 %% Smoothed curves
 
 figure('Position',[200 20 900 300])
+h=gcf;
+set(h,'PaperOrientation','landscape');
+
 subplot(1,3,1)
 % plot(D*prob2(:,1)*dt,prob2(:,2));hold on;
 plot(D*prob2(:,1)*dt,s1,'-r');

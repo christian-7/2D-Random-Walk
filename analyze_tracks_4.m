@@ -37,8 +37,7 @@ text(pos(length(pos),1)*dx,pos(length(pos),2)*dx,'End');hold on;
 title('XY scatter trajectory');
 xlabel('x (\mu m)','FontSize',12);
 ylabel('y (\mu m)','FontSize',12);
-colorbar
-
+colorbar('northoutside');
 
 %% Plot displacement from origin
 
@@ -219,8 +218,8 @@ ylabel('velocity (\mu m/s)','FontSize',12);
 subplot(2,3,6)
 hist(vel,20)
 title('Histogram of Velocity');
-xlabel('time (s)','FontSize',12);
-ylabel('velocity (\mu m/s)','FontSize',12);
+xlabel('velocity (\mu m/s)','FontSize',12);
+ylabel('counts','FontSize',12);
 
 %% Calculate confinement
 
