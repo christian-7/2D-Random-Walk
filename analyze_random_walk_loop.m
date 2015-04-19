@@ -16,7 +16,7 @@ step_size=sqrt(4*D*dt);     % D=(dx^2)/dt --> in ?m
 %% Calculate random walk in loop
 
 %%%
-n=50;
+n=5;
 random_walks=zeros(num_steps,n*2); % matrix 
 %%%
  j=1;
@@ -250,9 +250,9 @@ for i=1:length(conf_all)
         
 end
 
-s1(:,j)=smooth(D*frames*dt,conf_all(:,j),0.05,'loess');
-s2(:,j)=smooth(frames*dt,10.^(conf_all(:,j)),0.05,'loess');
-s3(:,j)=smooth(frames*dt, L(:,j),0.05,'loess');
+s1(:,j)=smooth(D*frames*dt,conf_all(:,j),0.1,'loess');
+s2(:,j)=smooth(frames*dt,10.^(conf_all(:,j)),0.1,'loess');
+s3(:,j)=smooth(frames*dt, L(:,j),0.1,'loess');
 
 
 subplot(1,3,1)
@@ -269,7 +269,7 @@ xlabel('time (s)','FontSize',12);
 ylabel('mean \psi','FontSize',12);
 
 subplot(1,3,3)
-% plot(L(:,2)*dt, L(:,1)); hold on;
+plot(frames*dt, L(:,j)); hold on;
 plot(frames*dt, s3(:,j));hold on;   
 xlabel('time (s)','FontSize',12);
 ylabel('probability level L','FontSize',12);

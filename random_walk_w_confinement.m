@@ -1,30 +1,33 @@
 clear all, close all, clc
 
-%% Generate Arena for random walk and add circles
+%% Initialize parameters for random walk and add circles
 
-D=1e-3;                     % diffusion constant, ?m2/s 
-D_conf=0.5e-3;
+%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%
+
+D=0.000605085473694187;                     % diffusion constant, ?m2/s 
+D_conf=1e-4;              % diffusion constant in confined areas, ?m2/s
 
 t=1:1:1000;                 % number od time steps, seconds        
 
 start=[1 1];                % starting coordinates
 num_steps=800;              % number of steps
                     
-dt=0.5;                     % time step, seconds
-dx=1;                     % pixel size, ?m
-step_size=sqrt(4*D*dt);  
-step_size_conf=sqrt(4*D_conf*dt);  
+dt=0.5;                                 % time step, seconds
+dx=1;                                   % pixel size, ?m
+step_size=sqrt(4*D*dt);                 % step size according to D
+step_size_conf=sqrt(4*D_conf*dt);       % step size according to D_conf
 
-% define circle
+% define confined areas as circles
 
 radius=0.1;
-center=[1.1 1.1];
+center=[1.0 1.0];
 center2=[0.6 0.8];
 center3=[1 0.4];
 
-% well1 = viscircles([0.1,0.1],0.1);
-
-%% Generate random walk Trajectory
+%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%
+%% Generate and plot random walk trajectory
 
 pos = zeros(num_steps,2);
 pos(1,1)=start(1);
@@ -57,7 +60,7 @@ for k=2:num_steps;
     
 end
 
-% subplot(2,3,1)
+
 figure('Position',[0 400 400 300])
 line(pos(:,1)*dx,pos(:,2)*dx);hold on;
 scatter(pos(:,1)*dx,pos(:,2)*dx,3,pos(:,3));hold on;
@@ -70,8 +73,8 @@ well2 = viscircles(center2, radius);
 well3 = viscircles(center3, radius);
 % axis([-1 1 -1 1])
 title('XY scatter trajectory');
-xlabel('x (\mu m)');
-ylabel('y (\mu m)');
+xlabel('x (\mum)','FontSize',12);
+ylabel('y (\mum)','FontSize',12);
 box on;
 
 %% Calculate confinement
@@ -86,8 +89,8 @@ frame(1,1)=1;               % starting from 1
 % i = frame --> Reihe
 % j = gap; --> Spalte
 
-prob=[];    %zeros(max(frame), 5);
-prob2=[];   %zeros(5, 2);
+prob=[];    % zeros(max(frame), 5);
+prob2=[];   % zeros(5, 2);
 d=[];
 vx=[];
 vy=[];
@@ -163,7 +166,7 @@ s3=smooth(L(:,2)*dt, L(:,1),0.05,'loess');
 
 
 figure('Position',[800 400 900 300])
-
+box on;
 h=gcf;
 set(h,'PaperOrientation','landscape');
 
@@ -193,6 +196,7 @@ ylabel('probability level L','FontSize',12);
 figure('Position',[800 20 900 300])
 h=gcf;
 set(h,'PaperOrientation','landscape');
+box on;
 subplot(1,3,1)
 % plot(D*prob2(:,1)*dt,prob2(:,2));hold on;
 plot(prob2(:,1)*dt,s1,'-r');
