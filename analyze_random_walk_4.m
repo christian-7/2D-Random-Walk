@@ -4,9 +4,9 @@ clear all, clc, close all
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-start=[1 1];            % starting coordinates
-num_steps=800;          % number of steps
-D=1e-3;                 % diffusion constant ?m2/s             
+start=[1 1];                                % starting coordinates
+num_steps=800;                              % number of steps
+D=0.000605085473694187;                     % diffusion constant ?m2/s             
 
 
 dt=0.5;                     % time step
@@ -49,6 +49,7 @@ text(pos(length(pos),1)*dx,pos(length(pos),2)*dx,'End');hold on;
 title('XY scatter trajectory');
 xlabel('x (\mu m)', 'FontSize',12);
 ylabel('y (\mu m)', 'FontSize',12);
+box on;
 
 c=colorbar%('northoutside');
 

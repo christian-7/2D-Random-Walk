@@ -1,33 +1,43 @@
-clear all, close all, clc
-
-%% Initialize parameters for random walk and add circles
-
-%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%
-
-D=0.000605085473694187;                     % diffusion constant, ?m2/s 
-D_conf=D/15;               % diffusion constant in confined areas, ?m2/s
-
-t=1:1:1000;                 % number od time steps, seconds        
+clear all, clc, close all
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% test
+D=0.000605085473694187;                     % diffusion constant, ?m2/s             
+t=1:1:1000;                 % number of time steps, seconds        
+R=0.1;                      % radius of the confinement zone, ?m
 
 start=[1 1];                % starting coordinates
-num_steps=800;              % number of steps
+num_steps=250;              % number of steps
                     
-dt=0.5;                                 % time step, seconds
-dx=1;                                   % pixel size, ?m
-step_size=sqrt(4*D*dt);                 % step size according to D
-step_size_conf=sqrt(4*D_conf*dt);       % step size according to D_conf
+dt=0.5;                     % time step, seconds
+dx=1;                     % pixel size, ?m
+step_size=sqrt(4*D*dt);     % step size from D, ?m
 
-% define confined areas as circles
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-radius=0.05;
-center=[1.1 1.1];
-center2=[0.6 0.8];
-center3=[2 1.4];
+% Simulate from Simson et al, 1995
 
-%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%
-%% Generate and plot random walk trajectory
+omega=0.2048-2.5117*((D*t)./(R^2));
+% 
+% figure('Position',[20 400 700 300])
+% 
+% h=gcf;
+% set(h,'PaperOrientation','landscape');
+
+subplot(1,2,1)
+plot(t,10.^omega); hold on;
+% title('Probability to stay in confined region with radius R (Simson et al, 1995)')
+xlabel('time (s)','FontSize',12);
+ylabel('\psi','FontSize',12);
+box on;
+
+subplot(1,2,2)
+plot(D*t/R^2,omega);hold on;
+xlabel('Dt/R^2','FontSize',12);
+ylabel('log(\psi)','FontSize',12);
+box on;
+
+%% Generate random walk Trajectory
 
 pos = zeros(num_steps,2);
 pos(1,1)=start(1);
@@ -40,42 +50,23 @@ angle = (b-a).*rand(num_steps,1) + a;
 
 for k=2:num_steps;
     
-    if  sqrt(((pos(k-1,1)-center(1,1))^2)+((pos(k-1,2)-center(1,2))^2)) <= radius | ...
-        sqrt(((pos(k-1,1)-center2(1,1))^2)+((pos(k-1,2)-center2(1,2))^2)) <= radius | ...
-        sqrt(((pos(k-1,1)-center3(1,1))^2)+((pos(k-1,2)-center3(1,2))^2)) <= radius;
-        
-    pos(k,1)=(pos(k-1,1))+sin(angle(k))*step_size_conf;
-    pos(k,2)=(pos(k-1,2))+cos(angle(k))*step_size_conf;
-    pos(k,3)=k*dt;
-    pos(k,4)=step_size_conf;
-    
-    else
-        
     pos(k,1)=(pos(k-1,1))+sin(angle(k))*step_size;
     pos(k,2)=(pos(k-1,2))+cos(angle(k))*step_size;
     pos(k,3)=k*dt; % time in seconds
-    pos(k,4)=step_size;
-
-    end
     
 end
 
-
-figure('Position',[0 400 400 300])
+% subplot(2,3,1)
+figure('Position',[730 400 400 300])
 line(pos(:,1)*dx,pos(:,2)*dx);hold on;
 scatter(pos(:,1)*dx,pos(:,2)*dx,3,pos(:,3));hold on;
 plot(pos(1,1)*dx,pos(1,2)*dx,'*b','MarkerSize',12);hold on;
 text(pos(1,1)*dx,pos(1,2)*dx, 'Start');
 plot(pos(length(pos),1)*dx,pos(length(pos),2)*dx,'+b','MarkerSize',12);hold on;
 text(pos(length(pos),1)*dx,pos(length(pos),2)*dx,'End');hold on;
-well1 = viscircles(center, radius);
-well2 = viscircles(center2, radius);
-well3 = viscircles(center3, radius);
-% axis([-1 1 -1 1])
 title('XY scatter trajectory');
-xlabel('x (\mum)','FontSize',12);
-ylabel('y (\mum)','FontSize',12);
-box on;
+xlabel('x (\mu m)');
+ylabel('y (\mu m)');
 
 %% Calculate confinement
 
@@ -89,14 +80,14 @@ frame(1,1)=1;               % starting from 1
 % i = frame --> Reihe
 % j = gap; --> Spalte
 
-prob=[];    % zeros(max(frame), 5);
-prob2=[];   % zeros(5, 2);
+prob=[];    %zeros(max(frame), 5);
+prob2=[];   %zeros(5, 2);
 d=[];
 vx=[];
 vy=[];
 
 
-for i=1:max(frame)-30;    % for all frames
+for i=1:max(frame)-4;    % for all frames
     vx=find(frame == i);
     
     if isempty(vx)==1;                   % if frame does not exist, skip   
@@ -165,10 +156,7 @@ s2=smooth(prob2(:,1)*dt,10.^(prob2(:,2)),0.05,'loess');
 s3=smooth(L(:,2)*dt, L(:,1),0.05,'loess');
 
 
-figure('Position',[800 400 900 300])
-box on;
-h=gcf;
-set(h,'PaperOrientation','landscape');
+figure('Position',[200 20 900 300])
 
 subplot(1,3,1)
 % plot(D*prob2(:,1)*dt,prob2(:,2));hold on;
@@ -193,14 +181,11 @@ ylabel('probability level L','FontSize',12);
 
 %% Smoothed curves
 
-figure('Position',[800 20 900 300])
-h=gcf;
-set(h,'PaperOrientation','landscape');
-box on;
+figure('Position',[200 20 900 300])
 subplot(1,3,1)
 % plot(D*prob2(:,1)*dt,prob2(:,2));hold on;
-plot(prob2(:,1)*dt,s1,'-r');
-xlabel('time(s)','FontSize',12);
+plot(D*prob2(:,1)*dt,s1,'-r');
+xlabel('Dt/R^2','FontSize',12);
 ylabel('mean log(\psi)','FontSize',12);
 
 subplot(1,3,2)

@@ -3,21 +3,31 @@ clear all, clc, close all
 %% Initiate parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-start=[1 1];                % starting coordinates
-num_steps=800;              % number of steps
+start=[1 1];                            % starting coordinates
+num_steps=800;                          % number of steps
 D=0.000605085473694187;                 % diffusion constant ?m2/s             
+D_conf=0.0000605085473694187;           % diffusion constant in confined areas, ?m2/s
 
+dt=0.5;                                 % time step
+dx=0.1;                                 % pixel size
+step_size=sqrt(4*D*dt);                 % D=(dx^2)/dt --> in ?m  
+step_size_conf=sqrt(4*D_conf*dt);       % step size according to D_conf
 
-dt=0.5;                     % time step
-dx=0.1;                     % pixel size
-step_size=sqrt(4*D*dt);     % D=(dx^2)/dt --> in ?m  
+% define confined areas as circles
+
+radius=0.05;
+
+center=[1.1 1.1];
+center2=[0.6 0.8];
+center3=[2 1.4];
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Calculate random walk in loop
 
 %%%
-n=100;                              % number of random walks
-random_walks=zeros(num_steps,n*2);  % matrix 
+n=50;
+random_walks=zeros(num_steps,n*2); % matrix 
 %%%
  j=1;
 
@@ -36,11 +46,26 @@ angle = (b-a).*rand(num_steps,1) + a;
 
 for k=2:num_steps;
     
-    pos(k,1)=(pos(k-1,1))+sin(angle(k))*step_size;      % pos in ?m
-    pos(k,2)=(pos(k-1,2))+cos(angle(k))*step_size;      % pos in ?m
-    pos(k,3)=k*dt;                                      % time in seconds
+    if  sqrt(((pos(k-1,1)-center(1,1))^2)+((pos(k-1,2)-center(1,2))^2)) <= radius | ...
+        sqrt(((pos(k-1,1)-center2(1,1))^2)+((pos(k-1,2)-center2(1,2))^2)) <= radius | ...
+        sqrt(((pos(k-1,1)-center3(1,1))^2)+((pos(k-1,2)-center3(1,2))^2)) <= radius;
+        
+    pos(k,1)=(pos(k-1,1))+sin(angle(k))*step_size_conf;
+    pos(k,2)=(pos(k-1,2))+cos(angle(k))*step_size_conf;
+    pos(k,3)=k*dt;
+    pos(k,4)=step_size_conf;
+    
+    else
+        
+    pos(k,1)=(pos(k-1,1))+sin(angle(k))*step_size;
+    pos(k,2)=(pos(k-1,2))+cos(angle(k))*step_size;
+    pos(k,3)=k*dt; % time in seconds
+    pos(k,4)=step_size;
+
+    end
     
 end
+
 
 random_walks(:,j)=pos(:,1);
 random_walks(:,j+1)=pos(:,2);
@@ -276,12 +301,11 @@ xlabel('time (s)','FontSize',12);
 ylabel('probability level L','FontSize',12);
 
 
+
 end
 
-figure('Position',[10 200 300 300])
-h=gcf;
-set(h,'PaperOrientation','landscape');
+figure
 hist(integral,10);
 title('Hist of integral')
-xlabel('counts','FontSize',12);
-ylabel('integral','FontSize',12);
+xlabel('lag time (s)','FontSize',12);
+ylabel('MSD (\mu m^2)','FontSize',12);

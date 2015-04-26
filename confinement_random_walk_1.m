@@ -1,10 +1,10 @@
 clear all, clc, close all
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% test
-D=1e-3;                     % diffusion constant, ?m2/s             
-t=1:1:1000;                 % number od time steps, seconds        
-R=0.3;                      % radius of the confinement zone, ?m
+
+D=0.000605085473694187;                     % diffusion constant, ?m2/s             
+t=1:1:1000;                                 % number of time steps, seconds        
+R=1;                                        % radius of the confinement zone, ?m
 
 start=[1 1];                % starting coordinates
 num_steps=250;              % number of steps
@@ -18,19 +18,24 @@ step_size=sqrt(4*D*dt);     % step size from D, ?m
 % Simulate from Simson et al, 1995
 
 omega=0.2048-2.5117*((D*t)./(R^2));
-
-figure('Position',[20 400 700 300])
+% 
+% figure('Position',[20 400 700 300])
+% 
+% h=gcf;
+% set(h,'PaperOrientation','landscape');
 
 subplot(1,2,1)
-plot(t,10.^omega);
-title('Probability to stay in confined region with radius R (Simson et al, 1995)')
+plot(t,10.^omega); hold on;
+% title('Probability to stay in confined region with radius R (Simson et al, 1995)')
 xlabel('time (s)','FontSize',12);
-ylabel('\psi','FontSize',12);
+ylabel('\psi (R,t)','FontSize',12);
+box on;
 
 subplot(1,2,2)
-plot(D*t/R^2,omega);
+plot(D*t/R^2,omega);hold on;
 xlabel('Dt/R^2','FontSize',12);
 ylabel('log(\psi)','FontSize',12);
+box on;
 
 %% Generate random walk Trajectory
 

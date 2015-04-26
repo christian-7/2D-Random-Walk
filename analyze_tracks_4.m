@@ -38,8 +38,8 @@ text(pos(length(pos),1)*dx,pos(length(pos),2)*dx,'End');hold on;
 title('XY scatter trajectory');
 xlabel('x (\mu m)','FontSize',12);
 ylabel('y (\mu m)','FontSize',12);
-colormap('hot');
-colorbar%('northoutside');
+% colormap('hot');
+% colorbar%('northoutside');
 
 %% Plot displacement from origin
 
@@ -346,6 +346,7 @@ s1=smooth(D*prob2(:,1)*dt,prob2(:,2),0.05,'rloess');
 s2=smooth(prob2(:,1)*dt,10.^(prob2(:,2)),0.05,'rloess');
 s3=smooth(L(:,2)*dt, L(:,1),0.005,'moving');%moving
 
+integral=sum(L(:,1)); % calculate integral
 
 figure('Position',[200 20 900 300])
 h=gcf;
@@ -373,4 +374,10 @@ xlabel('time (s)','FontSize',12);
 ylabel('probability level L','FontSize',12);
 
 
-
+figure('Position',[10 200 300 300])
+h=gcf;
+set(h,'PaperOrientation','landscape');
+hist(integral,10);
+title('Hist of integral')
+xlabel('integral','FontSize',12);
+ylabel('counts','FontSize',12);
