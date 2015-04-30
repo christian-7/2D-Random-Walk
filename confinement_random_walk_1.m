@@ -94,7 +94,7 @@ for i=1:max(frame)-4;    % for all frames
     else
         
     c=1; 
-    for j=1:30;                                         % segment length
+    for j=1:4;                                         % segment length
           
         vy=find(frame <= (i+j) & frame >= i );         % select segment
         subset(:,1)=pos(vy);                           % define segment as subset

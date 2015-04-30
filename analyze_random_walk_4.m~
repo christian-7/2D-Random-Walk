@@ -5,11 +5,11 @@ clear all, clc, close all
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 start=[1 1];                                % starting coordinates
-num_steps=300;                              % number of steps
+num_steps=90;                              % number of steps
 D=0.000605085473694187;                     % diffusion constant ?m2/s             
 
 
-dt=0.5;                     % time step
+dt=0.3;                     % time step
 dx=0.1;                     % pixel size
 step_size=sqrt(4*D*dt);     % D=(dx^2)/dt --> in ?m  
 % step_size=sqrt(D/dt);
