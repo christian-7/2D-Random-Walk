@@ -7,7 +7,6 @@
 % dt-time step
 % 
 % Date: 30/04/15
-% Author: Christian Sieben
 
 clear all, close all, clc
 
@@ -19,21 +18,22 @@ clear all, close all, clc
 D=0.000605085473694187;                     % diffusion constant, ?m2/s 
 D_conf=D/5;                                 % diffusion constant in confined areas, ?m2/s
 
-start=[0 0];                                % starting coordinates
-num_steps=300;                              % number of steps
-                    
-dt=0.3;                                     % time step, seconds
-dx=1;                                       % pixel size, ?m
-step_size=sqrt(4*D*dt);                     % step size according to D
-step_size_conf=sqrt(4*D_conf*dt);           % step size according to D_conf
+t=1:1:1000;                 % number od time steps fot the simulation, seconds        
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% define confined areas as circles with radius and center position
+start=[0 0];                % starting coordinates
+num_steps=300;              % number of steps
+                    
+dt=0.3;                                 % time step, seconds
+dx=1;                                   % pixel size, ?m
+step_size=sqrt(4*D*dt);                 % step size according to D
+step_size_conf=sqrt(4*D_conf*dt);       % step size according to D_conf
+
+% define confined areas as circles
 
 radius=0.05;
 center=[0.1 0.1];
 center2=[-0.2 0.2];
-center3=[-0.2 -0.1];
+center3=[0.5 0.4];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -71,7 +71,7 @@ for k=2:num_steps;
 end
 
 
-figure('Position',[0 400 400 300],'name','XY scatter trajectory')
+figure('Position',[0 400 400 300])
 line(pos(:,1)*dx,pos(:,2)*dx);hold on;
 scatter(pos(:,1)*dx,pos(:,2)*dx,3,pos(:,3));hold on;
 plot(pos(1,1)*dx,pos(1,2)*dx,'*b','MarkerSize',12);hold on;
@@ -81,7 +81,7 @@ text(pos(length(pos),1)*dx,pos(length(pos),2)*dx,'End');hold on;
 well1 = viscircles(center, radius);
 well2 = viscircles(center2, radius);
 well3 = viscircles(center3, radius);
-axis([-0.5 0.5 -0.5 0.5])
+axis([-1 1 -1 1])
 title('XY scatter trajectory');
 xlabel('x (\mum)','FontSize',12);
 ylabel('y (\mum)','FontSize',12);
@@ -177,7 +177,7 @@ end
 % s3=smooth(L(:,2)*dt, L(:,1),0.05,'loess');
 
 
-figure('Position',[400 400 900 300], 'name','Probability psi, log(psi), confinement index L')
+figure('Position',[200 20 900 300])
 
 subplot(1,3,1)
 % plot(D*prob2(:,1)*dt,prob2(:,2));hold on;
@@ -200,45 +200,26 @@ xlabel('time (s)','FontSize',12);
 ylabel('probability level L','FontSize',12);
 
 
-figure('Position',[200 800 300 300], 'name','confinement index L')
-plot(L(:,2)*dt, L(:,1)); hold on;
+%% Smoothed curves
+
+% figure('Position',[800 20 900 300])
+% h=gcf;
+% set(h,'PaperOrientation','landscape');
+% box on;
+% subplot(1,3,1)
+% % plot(D*prob2(:,1)*dt,prob2(:,2));hold on;
+% plot(prob2(:,1)*dt,s1,'-r');
+% xlabel('time(s)','FontSize',12);
+% ylabel('mean log(\psi)','FontSize',12);
+% 
+% subplot(1,3,2)
+% % plot(prob2(:,1)*dt,10.^(prob2(:,2)));hold on;
+% plot(prob2(:,1)*dt,s2,'-r');
+% xlabel('time (s)','FontSize',12);
+% ylabel('mean \psi','FontSize',12);
+% 
+% subplot(1,3,3)
+% % plot(L(:,2)*dt, L(:,1)); hold on;
 % plot(L(:,2)*dt, s3,'-r');       
-xlabel('time (s)','FontSize',12);
-ylabel('confinement index L','FontSize',12);
-
-
-%% Figures to save
-
-figure('Position',[200 800 300 300], 'name','confinement index L')
-plot(L(:,2)*dt, L(:,1)); hold on;
-% plot(L(:,2)*dt, s3,'-r');       
-xlabel('time (s)','FontSize',12);
-ylabel('confinement index L','FontSize',12);
-
-
-figure('Position',[600 800 600 300], 'name','XY scatter and confinement index L')
-subplot(1,2,1)
-line(pos(:,1)*dx,pos(:,2)*dx);hold on;
-scatter(pos(:,1)*dx,pos(:,2)*dx,10,pos(:,3),'filled');hold on;
-plot(pos(1,1)*dx,pos(1,2)*dx,'*b','MarkerSize',12);hold on;
-text(pos(1,1)*dx,pos(1,2)*dx, 'Start');
-plot(pos(length(pos),1)*dx,pos(length(pos),2)*dx,'+b','MarkerSize',12);hold on;
-text(pos(length(pos),1)*dx,pos(length(pos),2)*dx,'End');hold on;
-well1 = viscircles(center, radius);
-well2 = viscircles(center2, radius);
-well3 = viscircles(center3, radius);
-axis([-0.5 0.5 -0.5 0.5])
-title('XY scatter trajectory');
-xlabel('x (\mum)','FontSize',12);
-ylabel('y (\mum)','FontSize',12);
-box on;
-
-
-
-subplot(1,2,2)
-plot(L(:,2)*dt, L(:,1)); hold on;
-scatter(L(:,2)*dt, L(:,1),15,pos(:,3),'filled')
-% plot(L(:,2)*dt, s3,'-r');       
-xlabel('time (s)','FontSize',12);
-ylabel('confinement index L','FontSize',12);
-title('Confinement index L');
+% xlabel('time (s)','FontSize',12);
+% ylabel('probability level L','FontSize',12);

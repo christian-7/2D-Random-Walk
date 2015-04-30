@@ -1,43 +1,53 @@
-% 1. simulates a random walk according to the initialized parameters and adds confined areas with D_conf
-% 2. calculates the confinement index according to Simson, et al. (1995), Biophysical Journal, 69(September), 989–993. 
+% 1. simulates a random walk according to the initialized parameters
+% 2. simulates psi vs time and log psi vs time curves as presented in Simson, et al. (1995), Biophysical Journal, 69(September), 989–993. 
+% 3. calculates the confinement index according to Simson, et al. (1995), Biophysical Journal, 69(September), 989–993. 
 % 
 % 
 % D-diffusion coefficient
-% D_conf-diffusion coefficient in confined area
 % dt-time step
 % 
 % Date: 30/04/15
-% Author: Christian Sieben
 
-clear all, close all, clc
 
-%% Initialize parameters for random walk and add circles
+clear all, clc, close all
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+D=0.000605085473694187;                     % diffusion constant, mum2/s             
+t=1:1:1000;                                 % number of time steps for the simulation, seconds        
+R=1;                                        % radius of the confinement zone for simulation, mum
 
-D=0.000605085473694187;                     % diffusion constant, ?m2/s 
-D_conf=D/5;                                 % diffusion constant in confined areas, ?m2/s
-
-start=[0 0];                                % starting coordinates
-num_steps=300;                              % number of steps
+start=[0 0];                 % starting coordinates
+num_steps=300;               % number of steps
                     
-dt=0.3;                                     % time step, seconds
-dx=1;                                       % pixel size, ?m
-step_size=sqrt(4*D*dt);                     % step size according to D
-step_size_conf=sqrt(4*D_conf*dt);           % step size according to D_conf
+dt=0.3;                     % time step, seconds
+dx=1;                       % pixel size, ?m
+step_size=sqrt(4*D*dt);     % step size from D, ?m
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% define confined areas as circles with radius and center position
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-radius=0.05;
-center=[0.1 0.1];
-center2=[-0.2 0.2];
-center3=[-0.2 -0.1];
+% Simson, et al. (1995), Biophysical Journal, 69(September), 989–993
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Generate and plot random walk trajectory
+omega=0.2048-2.5117*((D*t)./(R^2)); % from Simson paper
+
+figure('Position',[20 400 700 300])
+h=gcf;
+set(h,'PaperOrientation','landscape');
+
+subplot(1,2,1)
+plot(t,10.^omega); hold on;
+% title('Probability to stay in confined region with radius R (Simson et al, 1995)')
+xlabel('time (s)','FontSize',12);
+ylabel('\psi (R,t)','FontSize',12);
+box on;
+
+subplot(1,2,2)
+plot(D*t/R^2,omega);hold on;
+xlabel('Dt/R^2','FontSize',12);
+ylabel('log(\psi)','FontSize',12);
+box on;
+
+%% Generate random walk Trajectory
 
 pos = zeros(num_steps,2);
 pos(1,1)=start(1);
@@ -50,42 +60,24 @@ angle = (b-a).*rand(num_steps,1) + a;
 
 for k=2:num_steps;
     
-    if  sqrt(((pos(k-1,1)-center(1,1))^2)+((pos(k-1,2)-center(1,2))^2)) <= radius | ...
-        sqrt(((pos(k-1,1)-center2(1,1))^2)+((pos(k-1,2)-center2(1,2))^2)) <= radius | ...
-        sqrt(((pos(k-1,1)-center3(1,1))^2)+((pos(k-1,2)-center3(1,2))^2)) <= radius;
-        
-    pos(k,1)=(pos(k-1,1))+sin(angle(k))*step_size_conf;
-    pos(k,2)=(pos(k-1,2))+cos(angle(k))*step_size_conf;
-    pos(k,3)=k*dt;
-    pos(k,4)=step_size_conf;
-    
-    else
-        
     pos(k,1)=(pos(k-1,1))+sin(angle(k))*step_size;
     pos(k,2)=(pos(k-1,2))+cos(angle(k))*step_size;
     pos(k,3)=k*dt; % time in seconds
-    pos(k,4)=step_size;
-
-    end
     
 end
 
-
-figure('Position',[0 400 400 300],'name','XY scatter trajectory')
+% subplot(2,3,1)
+figure('Position',[730 400 400 300])
 line(pos(:,1)*dx,pos(:,2)*dx);hold on;
 scatter(pos(:,1)*dx,pos(:,2)*dx,3,pos(:,3));hold on;
 plot(pos(1,1)*dx,pos(1,2)*dx,'*b','MarkerSize',12);hold on;
 text(pos(1,1)*dx,pos(1,2)*dx, 'Start');
 plot(pos(length(pos),1)*dx,pos(length(pos),2)*dx,'+b','MarkerSize',12);hold on;
 text(pos(length(pos),1)*dx,pos(length(pos),2)*dx,'End');hold on;
-well1 = viscircles(center, radius);
-well2 = viscircles(center2, radius);
-well3 = viscircles(center3, radius);
-axis([-0.5 0.5 -0.5 0.5])
 title('XY scatter trajectory');
-xlabel('x (\mum)','FontSize',12);
-ylabel('y (\mum)','FontSize',12);
-box on;
+xlabel('x (\mu m)');
+ylabel('y (\mu m)');
+axis([-1 1 -1 1])
 
 %% Calculate confinement
 
@@ -177,7 +169,7 @@ end
 % s3=smooth(L(:,2)*dt, L(:,1),0.05,'loess');
 
 
-figure('Position',[400 400 900 300], 'name','Probability psi, log(psi), confinement index L')
+figure('Position',[200 20 900 300], 'name','Probability psi, log(psi), confinement index L)')
 
 subplot(1,3,1)
 % plot(D*prob2(:,1)*dt,prob2(:,2));hold on;
@@ -197,48 +189,32 @@ subplot(1,3,3)
 plot(L(:,2)*dt, L(:,1)); hold on;
 % plot(L(:,2)*dt, s3,'-r');       
 xlabel('time (s)','FontSize',12);
-ylabel('probability level L','FontSize',12);
+ylabel('confinement index L','FontSize',12);
 
-
-figure('Position',[200 800 300 300], 'name','confinement index L')
+figure('Position',[200 20 300 300], 'name','confinement index L)')
 plot(L(:,2)*dt, L(:,1)); hold on;
 % plot(L(:,2)*dt, s3,'-r');       
 xlabel('time (s)','FontSize',12);
 ylabel('confinement index L','FontSize',12);
 
 
-%% Figures to save
+%% Smoothed curves
 
-figure('Position',[200 800 300 300], 'name','confinement index L')
-plot(L(:,2)*dt, L(:,1)); hold on;
+% figure('Position',[200 20 900 300])
+% subplot(1,3,1)
+% % plot(D*prob2(:,1)*dt,prob2(:,2));hold on;
+% plot(D*prob2(:,1)*dt,s1,'-r');
+% xlabel('Dt/R^2','FontSize',12);
+% ylabel('mean log(\psi)','FontSize',12);
+% 
+% subplot(1,3,2)
+% % plot(prob2(:,1)*dt,10.^(prob2(:,2)));hold on;
+% plot(prob2(:,1)*dt,s2,'-r');
+% xlabel('time (s)','FontSize',12);
+% ylabel('mean \psi','FontSize',12);
+% 
+% subplot(1,3,3)
+% % plot(L(:,2)*dt, L(:,1)); hold on;
 % plot(L(:,2)*dt, s3,'-r');       
-xlabel('time (s)','FontSize',12);
-ylabel('confinement index L','FontSize',12);
-
-
-figure('Position',[600 800 600 300], 'name','XY scatter and confinement index L')
-subplot(1,2,1)
-line(pos(:,1)*dx,pos(:,2)*dx);hold on;
-scatter(pos(:,1)*dx,pos(:,2)*dx,10,pos(:,3),'filled');hold on;
-plot(pos(1,1)*dx,pos(1,2)*dx,'*b','MarkerSize',12);hold on;
-text(pos(1,1)*dx,pos(1,2)*dx, 'Start');
-plot(pos(length(pos),1)*dx,pos(length(pos),2)*dx,'+b','MarkerSize',12);hold on;
-text(pos(length(pos),1)*dx,pos(length(pos),2)*dx,'End');hold on;
-well1 = viscircles(center, radius);
-well2 = viscircles(center2, radius);
-well3 = viscircles(center3, radius);
-axis([-0.5 0.5 -0.5 0.5])
-title('XY scatter trajectory');
-xlabel('x (\mum)','FontSize',12);
-ylabel('y (\mum)','FontSize',12);
-box on;
-
-
-
-subplot(1,2,2)
-plot(L(:,2)*dt, L(:,1)); hold on;
-scatter(L(:,2)*dt, L(:,1),15,pos(:,3),'filled')
-% plot(L(:,2)*dt, s3,'-r');       
-xlabel('time (s)','FontSize',12);
-ylabel('confinement index L','FontSize',12);
-title('Confinement index L');
+% xlabel('time (s)','FontSize',12);
+% ylabel('probability level L','FontSize',12);

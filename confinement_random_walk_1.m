@@ -151,9 +151,9 @@ L(i,2)=i;
     
 end
 
-s1=smooth(D*prob2(:,1)*dt,prob2(:,2),0.05,'loess');
-s2=smooth(prob2(:,1)*dt,10.^(prob2(:,2)),0.05,'loess');
-s3=smooth(L(:,2)*dt, L(:,1),0.05,'loess');
+% s1=smooth(D*prob2(:,1)*dt,prob2(:,2),0.05,'loess');
+% s2=smooth(prob2(:,1)*dt,10.^(prob2(:,2)),0.05,'loess');
+% s3=smooth(L(:,2)*dt, L(:,1),0.05,'loess');
 
 
 figure('Position',[200 20 900 300])
@@ -162,40 +162,40 @@ subplot(1,3,1)
 % plot(D*prob2(:,1)*dt,prob2(:,2));hold on;
 % plot(D*prob2(:,1)*dt,s1,'-r');
 plot(prob2(:,1)*dt,prob2(:,2));hold on;
-plot(prob2(:,1)*dt,s1,'-r');
+% plot(prob2(:,1)*dt,s1,'-r');
 xlabel('time (s)','FontSize',12);
 ylabel('mean log(\psi)','FontSize',12);
 
 subplot(1,3,2)
 plot(prob2(:,1)*dt,10.^(prob2(:,2)));hold on;
-plot(prob2(:,1)*dt,s2,'-r');
+% plot(prob2(:,1)*dt,s2,'-r');
 xlabel('time (s)','FontSize',12);
 ylabel('mean \psi','FontSize',12);
 
 subplot(1,3,3)
 plot(L(:,2)*dt, L(:,1)); hold on;
-plot(L(:,2)*dt, s3,'-r');       
+% plot(L(:,2)*dt, s3,'-r');       
 xlabel('time (s)','FontSize',12);
 ylabel('probability level L','FontSize',12);
 
 
 %% Smoothed curves
 
-figure('Position',[200 20 900 300])
-subplot(1,3,1)
-% plot(D*prob2(:,1)*dt,prob2(:,2));hold on;
-plot(D*prob2(:,1)*dt,s1,'-r');
-xlabel('Dt/R^2','FontSize',12);
-ylabel('mean log(\psi)','FontSize',12);
-
-subplot(1,3,2)
-% plot(prob2(:,1)*dt,10.^(prob2(:,2)));hold on;
-plot(prob2(:,1)*dt,s2,'-r');
-xlabel('time (s)','FontSize',12);
-ylabel('mean \psi','FontSize',12);
-
-subplot(1,3,3)
-% plot(L(:,2)*dt, L(:,1)); hold on;
-plot(L(:,2)*dt, s3,'-r');       
-xlabel('time (s)','FontSize',12);
-ylabel('probability level L','FontSize',12);
+% figure('Position',[200 20 900 300])
+% subplot(1,3,1)
+% % plot(D*prob2(:,1)*dt,prob2(:,2));hold on;
+% plot(D*prob2(:,1)*dt,s1,'-r');
+% xlabel('Dt/R^2','FontSize',12);
+% ylabel('mean log(\psi)','FontSize',12);
+% 
+% subplot(1,3,2)
+% % plot(prob2(:,1)*dt,10.^(prob2(:,2)));hold on;
+% plot(prob2(:,1)*dt,s2,'-r');
+% xlabel('time (s)','FontSize',12);
+% ylabel('mean \psi','FontSize',12);
+% 
+% subplot(1,3,3)
+% % plot(L(:,2)*dt, L(:,1)); hold on;
+% plot(L(:,2)*dt, s3,'-r');       
+% xlabel('time (s)','FontSize',12);
+% ylabel('probability level L','FontSize',12);
