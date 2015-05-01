@@ -125,6 +125,7 @@ for i=1:max(frame)-segment;                         % for all frames
             end
         R=max(d);                                                      % maximum distance within subset
         prob(i:(i+j),c)=0.2048-2.5117*((D*j)./(R^2));                  % probability within subset
+%         prob(i,j-3)=0.2048-2.5117*((D*j)./(R^2));
 %         prob(c,i:(i+j))=((D*j)./(R^2));
 
 %       prob(c,i:(i+j))=horzcat(prob(c,i:(i+j)),((D*j)./(R^2)));
