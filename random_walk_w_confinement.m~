@@ -17,7 +17,7 @@ clear all, close all, clc
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 D=0.01;                     % diffusion constant, ?m2/s 
-D_conf=D/30;                                 % diffusion constant in confined areas, ?m2/s
+D_conf=D/100;                                 % diffusion constant in confined areas, ?m2/s
 
 start=[0 0];                                % starting coordinates
 num_steps=300;                              % number of steps
@@ -243,49 +243,3 @@ scatter(L(:,2)*dt, L(:,1),15,pos(:,3),'filled')
 xlabel('time (s)','FontSize',12);
 ylabel('confinement index L','FontSize',12);
 title('Confinement index L');
-
-%% 
-figure('Position',[500 800 500 600], 'name','Compare time with displacement and confinement')
-h=gcf;
-set(h,'PaperOrientation','portrait');
-
-subplot(4,1,1)
-line(pos(:,3)*dt,pos(:,1));hold on;
-scatter(pos(:,3)*dt,pos(:,1),5,pos(:,3)*dt);hold on;
-xlabel('time (s)','FontSize',12);
-ylabel('x (\mu m)','FontSize',12);
-box on;
-
-
-
-subplot(4,1,2)
-line(frame*dt,pos(:,2));hold on;
-scatter(frame*dt,pos(:,2),5,pos(:,3));hold on;
-xlabel('time (s)','FontSize',12);
-ylabel('y (\mu m)','FontSize',12);
-box on;
-
-subplot(4,1,3)
-plot(L(:,2)*dt, L(:,1)); hold on;
-scatter(L(:,2)*dt, L(:,1),15,pos(:,3),'filled')     
-xlabel('time (s)','FontSize',12);
-ylabel('confinement index L','FontSize',12);
-box on;
-
-dcum = zeros(num_steps,1);
-dcum(1,1)=0;
-
-for k=2:num_steps;
-    
-    dist(k,1)=sqrt(((pos(k,1)-pos(1,1))^2)+((pos(k,2)-pos(1,2))^2));
-
-    dcum(k)=dist(k)+dcum(k-1);
-end
-
-
-subplot(4,1,4)
-plot(frame*dt,dist); hold on;
-scatter(frame*dt,dist,2,pos(:,3)*dt);
-xlabel('time (s)','FontSize',12);
-ylabel('distance from origin (\mu m)','FontSize',12);
-box on;

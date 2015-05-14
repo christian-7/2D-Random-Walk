@@ -1,13 +1,14 @@
-% 1. simulates a random walk in a loop n times according to the initialized parameters and adds confined areas with D_conf
-% 2. calculates the confinement index according to Simson, et al. (1995), Biophysical Journal, 69(September), 989?993. 
+% 1. simulates n random walks according to the initialized parameters
+% 2. calculates trajectory parameters: scatter, MSD, velocity, distance from origin
+% 3. calculates the confinement index according to Simson, et al. (1995), Biophysical Journal, 69(September), 989?993. 
 % 
 % 
 % D-diffusion coefficient
-% D_conf-diffusion coefficient in confined area
 % dt-time step
-% segment-segment length in frames
+% n-number of cycles
+% segment-segment length in frames (Sm
 % 
-% Date:     30/04/15
+% Date:     04/05/15
 % Author:   Christian Sieben
 
 clear all, clc, close all
@@ -15,35 +16,22 @@ clear all, clc, close all
 %% Initiate parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-start=[1 1];                            % starting coordinates
-num_steps=300;                          % number of steps
-D=0.0046;                               % diffusion constant ?m2/s             
-D_conf=D/100;                           % diffusion constant in confined areas, ?m2/s
-n=5;                                    % number of random walks
-segment=30;                             % Sm, segment length in frames
+start=[1 1];                % starting coordinates
+num_steps=300;              % number of steps
+D=0.01;                     % diffusion constant ?m2/s             
+segment=20;                 % Sm, segment length in frames
+n=3;                       % number of random walks
 
-dt=0.3;                                 % time step
-dx=1;                                   % pixel size
-step_size=sqrt(4*D*dt);                 % D=(dx^2)/dt --> in ?m  
-step_size_conf=sqrt(4*D_conf*dt);       % step size according to D_conf
-
-% define confined areas as circles
-
-radius=0.08;
-
-center=[1.1 1.1];
-center2=[0.6 0.8];
-center3=[2 1.4];
-
+dt=0.3;                     % time step
+dx=0.1;                     % pixel size
+step_size=sqrt(4*D*dt);     % D=(dx^2)/dt --> in ?m  
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Calculate random walk in loop
 
-%%%
+random_walks=zeros(num_steps,n*2);  % generate matrix 
 
-random_walks=zeros(num_steps,n*2); % matrix 
-%%%
- j=1;
+j=1;
 
 for i=1:n;
 
@@ -60,26 +48,11 @@ angle = (b-a).*rand(num_steps,1) + a;
 
 for k=2:num_steps;
     
-    if  sqrt(((pos(k-1,1)-center(1,1))^2)+((pos(k-1,2)-center(1,2))^2)) <= radius | ...
-        sqrt(((pos(k-1,1)-center2(1,1))^2)+((pos(k-1,2)-center2(1,2))^2)) <= radius | ...
-        sqrt(((pos(k-1,1)-center3(1,1))^2)+((pos(k-1,2)-center3(1,2))^2)) <= radius;
-        
-    pos(k,1)=(pos(k-1,1))+sin(angle(k))*step_size_conf;
-    pos(k,2)=(pos(k-1,2))+cos(angle(k))*step_size_conf;
-    pos(k,3)=k*dt;
-    pos(k,4)=step_size_conf;
-    
-    else
-        
-    pos(k,1)=(pos(k-1,1))+sin(angle(k))*step_size;
-    pos(k,2)=(pos(k-1,2))+cos(angle(k))*step_size;
-    pos(k,3)=k*dt; % time in seconds
-    pos(k,4)=step_size;
-
-    end
+    pos(k,1)=(pos(k-1,1))+sin(angle(k))*step_size;      % pos in ?m
+    pos(k,2)=(pos(k-1,2))+cos(angle(k))*step_size;      % pos in ?m
+    pos(k,3)=k*dt;                                      % time in seconds
     
 end
-
 
 random_walks(:,j)=pos(:,1);
 random_walks(:,j+1)=pos(:,2);
@@ -256,7 +229,7 @@ prob2(l,2)=mean(nonzeros(prob(l,:)));   % this is psi
 
 end
   
-conf_all(:,u)=prob2(:,2); % this is psi
+conf_all(:,u)=prob2(:,2); % this is omega
 
 
 u=u+1;
@@ -269,7 +242,7 @@ end
 
 L=[];
 frames=1:length(conf_all);
-figure('Position',[200 20 900 300])
+figure('Position',[200 20 900 300],'name','Confinement parameters')
 h=gcf;
 set(h,'PaperOrientation','landscape');
 
@@ -289,33 +262,23 @@ for i=1:length(conf_all)
     end
         
 end
-% 
-% s1(:,j)=smooth(D*frames*dt,conf_all(:,j),0.1,'loess');
-% s2(:,j)=smooth(frames*dt,10.^(conf_all(:,j)),0.1,'loess');
-% s3(:,j)=smooth(frames*dt, L(:,j),0.1,'loess');
 
 integral(j,:)=sum(L(:,j)); % calculate integral
 
 subplot(1,3,1)
-% plot(D*prob2(:,1)*dt,prob2(:,2));hold on;
-% plot(D*frames*dt,s1(:,j),'-r');hold on;
 plot(frames*dt,conf_all(:,j));hold on;
 xlabel('time(s)','FontSize',12);
 ylabel('mean log(\psi)','FontSize',12);
 
 subplot(1,3,2)
-% plot(prob2(:,1)*dt,10.^(prob2(:,2)));hold on;
 plot(frames*dt,10.^(conf_all(:,j)));hold on;
 xlabel('time (s)','FontSize',12);
 ylabel('mean \psi','FontSize',12);
 
 subplot(1,3,3)
-% plot(frames*dt, L(:,j)); hold on;
-plot(frames*dt,L(:,j));hold on;   
+plot(frames*dt, L(:,j)); hold on;  
 xlabel('time (s)','FontSize',12);
 ylabel('probability level L','FontSize',12);
-
-
 
 end
 
@@ -324,5 +287,5 @@ h=gcf;
 set(h,'PaperOrientation','landscape');
 hist(integral,10);
 title('Hist of integral')
-xlabel('integral','FontSize',12);
-ylabel('counts','FontSize',12);
+xlabel('counts','FontSize',12);
+ylabel('integral','FontSize',12);

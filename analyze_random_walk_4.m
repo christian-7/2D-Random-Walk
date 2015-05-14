@@ -1,3 +1,14 @@
+% 1. simulates a random walk according to the initialized parameters
+% 2. calculates trajectory parameters: scatter, MSD, velocity, distance from origin
+% 3. calculates the confinement index according to Simson, et al. (1995), Biophysical Journal, 69(September), 989?993. 
+% 
+% 
+% D-diffusion coefficient
+% dt-time step
+% 
+% Date:     04/05/15
+% Author:   Christian Sieben
+
 clear all, clc, close all
 
 %% Initiate parameters
@@ -6,15 +17,19 @@ clear all, clc, close all
 
 start=[1 1];                                % starting coordinates
 num_steps=300;                              % number of steps
-D=0.000605085473694187;                     % diffusion constant ?m2/s             
+D=0.046;                                     % diffusion constant ?m2/s             
+segment=20;                                 % Sm, segment length in frames
 
 
-dt=0.5;                     % time step
-dx=0.1;                     % pixel size
+dt=0.3;                     % time step
+dx=1;                       % pixel size
 step_size=sqrt(4*D*dt);     % D=(dx^2)/dt --> in ?m  
-% step_size=sqrt(D/dt);
 
-figure('Position',[200 400 900 650])
+minAxis=-2.5;               % min axis 
+maxAxis=2.5;                % max axis
+
+
+figure('Position',[200 400 900 650],'name','Overview Figure: scatter, velocity, MSD, cum. displacement')
 h=gcf;
 set(h,'PaperOrientation','landscape');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -47,11 +62,11 @@ text(pos(1,1)*dx,pos(1,2)*dx, 'Start');
 plot(pos(length(pos),1)*dx,pos(length(pos),2)*dx,'+b','MarkerSize',12);hold on;
 text(pos(length(pos),1)*dx,pos(length(pos),2)*dx,'End');hold on;
 title('XY scatter trajectory');
+axis([minAxis maxAxis minAxis maxAxis])
 xlabel('x (\mu m)', 'FontSize',12);
 ylabel('y (\mu m)', 'FontSize',12);
 box on;
-
-c=colorbar%('northoutside');
+% c=colorbar%('northoutside');
 
 
 %% Plot displacement from origin
@@ -61,13 +76,13 @@ dcum(1,1)=0;
 
 for k=2:num_steps;
     
-    d(k,1)=sqrt(((pos(k,1)-pos(1,1))^2)+((pos(k,2)-pos(1,2))^2));
+    dist(k,1)=sqrt(((pos(k,1)-pos(1,1))^2)+((pos(k,2)-pos(1,2))^2));
 
-    dcum(k)=d(k)+dcum(k-1);
+    dcum(k)=dist(k)+dcum(k-1);
 end
 
 subplot(2,3,4)
-scatter(pos(:,3),d*dx,2,pos(:,3));
+scatter(pos(:,3),dist*dx,2,pos(:,3));
 title('Distance from origin');
 xlabel('time (s)', 'FontSize',12);
 ylabel('distance from origin (\mu m)', 'FontSize',12);
@@ -80,67 +95,6 @@ axis([1 100 0.001 1e5])
 title('Cumulative Distance from Origin', 'FontSize',12);
 xlabel('time (s)', 'FontSize',12);
 ylabel('cumulative distance from origin (\mu m)', 'FontSize',12);
-
-% %% Calculate MSD (from Nathanael)
-% 
-% tab(:,1)=pos(:,3); %1:1:length(pos);
-% tab(:,2)=pos(:,1);
-% tab(:,3)=pos(:,2);
-% X=tab(:,2:3);
-% 
-% % dx=0.1;     % pixel size
-% % dt=0.5;       % time step
-% 
-% % X=data(:,2:3);
-% 
-% frame=tab(:,1);
-% frame=frame-min(frame);           % if it does not start with 0
-% % frame=frame/dt;                 % frame in sec
-% N=(max(frame)-min(frame)+1);      % number of frames
-% 
-% msd=zeros(1,N);
-% Time = [0:N-1]*dt;
-% f=zeros(1,N);
-% 
-% 
-% % Find the frames that have been recorded
-% 
-% for j=0:N
-%     if ~isempty(find(frame==j))
-%         f(j+1)=find(frame==j,1);
-%     end
-% end
-% 
-% 
-% 
-% for i=1:N-1
-%     c=0;
-%     
-%     for j=0:N-i-1
-%         if f(i+j+1)>0 && f(j+1)>0
-%             c=c+1;
-%             msd(i+1)=msd(i+1)+ sum((X(f(i+j+1),:)-X(f(j+1),:)).^2 );
-%         end
-%     end
-%     if c>0
-%         msd(i+1)=msd(i+1)/c;
-%     end
-% end
-% 
-% 
-% % msd=msd*dx^2%/dt;
-% 
-% subplot(2,3,2)
-% scatter(Time,msd);hold on;
-% title('Mean square displacement');
-% xlabel('time step', 'FontSize',12);
-% ylabel('MSD (\mu m^2)', 'FontSize',12);
-% %axis([0 50 0 5]);
-% % legend('Nathanael');
-% % set(leg2,'FontSize',12);
-% hold on;
-% 
-% % clear dt;
 
 %% My MSD
 
@@ -244,51 +198,51 @@ d=[];
 vx=[];
 vy=[];
 
+c=1;
 
-for i=1:max(frame)-10;    % for all frames
-    vx=find(frame == i);
+for i=1:max(frame)-segment;                       % for all frames
+    vx=find(frame == i);                     % find frame i
     
-    if isempty(vx)==1;                   % if frame does not exist, skip   
+    if isempty(vx)==1;                       % if frame does not exist, skip   
     else
         
-    c=1; 
-    for j=1:30;                                         % segment length in frames
+     
+    for j=4:segment;                                           % segment length
           
-        vy=find(frame <= (i+j) & frame >= i );         % select segment
-        subset(:,1)=pos(vy);                           % define segment as subset
+        vy=find(frame <= (i+j) & frame >= i );          % select segment
+        subset(:,1)=pos(vy);                            % define segment as subset
         subset(:,2)=pos(vy,2);
         
         if length(vy)==1;   % if subset is only 1 frame --> distance is 0
                      R=0;
         else    
         
-            for k=2:length(subset);
-            
-                 d(k,1)=sqrt(((subset(k,1)-subset(1,1))^2)+((subset(k,2)-subset(1,2))^2));   
-                 R=max(d);
-        
+            for  k=2:length(subset);
+                 d(k,1)=sqrt(((subset(k,1)-subset(1,1))^2)+((subset(k,2)-subset(1,2))^2));    % calculate the distance to each point in subset from point i  
             end
-        
-                                                                    % maximum distance within subset
-        prob(i:(i+j),c)=0.2048-2.5117*((D*j)./(R^2));               % probability within subset
+        R=max(d);                                                      % maximum distance within subset
+        prob(i:(i+j),c)=0.2048-2.5117*((D*j)./(R^2));                  % probability within subset
+%         prob(c,i:(i+j))=((D*j)./(R^2));
 
+%       prob(c,i:(i+j))=horzcat(prob(c,i:(i+j)),((D*j)./(R^2)));
+        c=c+1;  
         clear subset
         end
     
-    c=c+1;    
+%     c=c+1;    
         
     end
-    clear vx vy R d c;
+    clear vx vy R d;
     
     end
    
 end
 clear subset
 
-for l=1:length(prob)
+for l=1:length(frame)
     
-prob2(l,1)=l;
-prob2(l,2)=mean(nonzeros(prob(l,:))); % this is omega
+prob2(l,1)=l;                           % frame
+prob2(l,2)=mean(nonzeros(prob(l,:)));   % this is psi
 
 end
 
@@ -309,56 +263,104 @@ L(i,2)=i;
     
 end
 
-s1=smooth(D*prob2(:,1)*dt,prob2(:,2),0.05,'loess');
-s2=smooth(prob2(:,1)*dt,10.^(prob2(:,2)),0.05,'loess');
-s3=smooth(L(:,2)*dt, L(:,1),0.05,'loess');
-
-
-figure('Position',[200 20 900 300])
+figure('Position',[200 20 900 300],'name','Confinement parameters')
 h=gcf;
 set(h,'PaperOrientation','landscape');
 
 subplot(1,3,1)
 plot(D*prob2(:,1)*dt,prob2(:,2));hold on;
-plot(D*prob2(:,1)*dt,s1,'-r');
 xlabel('Dt/R^2','FontSize',12);
 ylabel('mean log(\psi)','FontSize',12);
 
 subplot(1,3,2)
 plot(prob2(:,1)*dt,10.^(prob2(:,2)));hold on;
-plot(prob2(:,1)*dt,s2,'-r');
 xlabel('time (s)','FontSize',12);
 ylabel('mean \psi','FontSize',12);
 
 subplot(1,3,3)
-plot(L(:,2)*dt, L(:,1)); hold on;
-plot(L(:,2)*dt, s3,'-r');       
+plot(L(:,2)*dt, L(:,1)); hold on;       
 xlabel('time (s)','FontSize',12);
 ylabel('probability level L','FontSize',12);
 
+%% Figures to save
 
-%% Smoothed curves
+figure('Position',[200 800 300 300], 'name','confinement index L')
 
-figure('Position',[200 20 900 300])
+plot(L(:,2)*dt, L(:,1)); hold on;
+% plot(L(:,2)*dt, s3,'-r');       
+xlabel('time (s)','FontSize',12);
+ylabel('confinement index L','FontSize',12);
+
+
+figure('Position',[600 800 600 300], 'name','XY scatter and confinement index L')
 h=gcf;
 set(h,'PaperOrientation','landscape');
 
-subplot(1,3,1)
-% plot(D*prob2(:,1)*dt,prob2(:,2));hold on;
-plot(D*prob2(:,1)*dt,s1,'-r');
-xlabel('Dt/R^2','FontSize',12);
-ylabel('mean log(\psi)','FontSize',12);
+subplot(1,2,1)
+line(pos(:,1)*dx,pos(:,2)*dx);hold on;
+scatter(pos(:,1)*dx,pos(:,2)*dx,10,pos(:,3),'filled');hold on;
+plot(pos(1,1)*dx,pos(1,2)*dx,'*b','MarkerSize',12);hold on;
+text(pos(1,1)*dx,pos(1,2)*dx, 'Start');
+plot(pos(length(pos),1)*dx,pos(length(pos),2)*dx,'+b','MarkerSize',12);hold on;
+text(pos(length(pos),1)*dx,pos(length(pos),2)*dx,'End');hold on;
+axis([minAxis maxAxis minAxis maxAxis])
+title('XY scatter trajectory');
+xlabel('x (\mum)','FontSize',12);
+ylabel('y (\mum)','FontSize',12);
+box on;
 
-subplot(1,3,2)
-% plot(prob2(:,1)*dt,10.^(prob2(:,2)));hold on;
-plot(prob2(:,1)*dt,s2,'-r');
+subplot(1,2,2)
+plot(L(:,2)*dt, L(:,1)); hold on;
+scatter(L(:,2)*dt, L(:,1),15,pos(:,3),'filled')
+% plot(L(:,2)*dt, s3,'-r');       
 xlabel('time (s)','FontSize',12);
-ylabel('mean \psi','FontSize',12);
+ylabel('confinement index L','FontSize',12);
+title('Confinement index L');
+%% 
 
-subplot(1,3,3)
-% plot(L(:,2)*dt, L(:,1)); hold on;
-plot(L(:,2)*dt, s3,'-r');       
+figure('Position',[500 800 500 600], 'name','Compare time with displacement and confinement')
+h=gcf;
+set(h,'PaperOrientation','portrait');
+
+subplot(4,1,1)
+line(pos(:,3)*dt,pos(:,1));hold on;
+scatter(pos(:,3)*dt,pos(:,1),5,pos(:,3)*dt);hold on;
 xlabel('time (s)','FontSize',12);
-ylabel('probability level L','FontSize',12);
+ylabel('x (\mu m)','FontSize',12);
+box on;
+
+
+
+subplot(4,1,2)
+line(frame*dt,pos(:,2));hold on;
+scatter(frame*dt,pos(:,2),5,pos(:,3));hold on;
+xlabel('time (s)','FontSize',12);
+ylabel('y (\mu m)','FontSize',12);
+box on;
+
+subplot(4,1,3)
+plot(L(:,2)*dt, L(:,1)); hold on;
+scatter(L(:,2)*dt, L(:,1),15,pos(:,3),'filled')     
+xlabel('time (s)','FontSize',12);
+ylabel('confinement index L','FontSize',12);
+box on;
+
+dcum = zeros(num_steps,1);
+dcum(1,1)=0;
+
+for k=2:num_steps;
+    
+    dist(k,1)=sqrt(((pos(k,1)-pos(1,1))^2)+((pos(k,2)-pos(1,2))^2));
+
+    dcum(k)=dist(k)+dcum(k-1);
+end
+
+
+subplot(4,1,4)
+plot(frame*dt,dist); hold on;
+scatter(frame*dt,dist,2,pos(:,3)*dt);
+xlabel('time (s)','FontSize',12);
+ylabel('distance from origin (\mu m)','FontSize',12);
+box on;
 
 

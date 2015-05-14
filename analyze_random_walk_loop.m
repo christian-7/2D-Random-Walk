@@ -1,25 +1,37 @@
+% 1. simulates n random walks according to the initialized parameters
+% 2. MSD overlay plot
+% 3. calculates the confinement index according to Simson, et al. (1995), Biophysical Journal, 69(September), 989?993. 
+% 
+% 
+% D-diffusion coefficient
+% dt-time step
+% n-number of cycles
+% segment-segment length in frames (Sm)
+% 
+% Date:     04/05/15
+% Author:   Christian Sieben
+
 clear all, clc, close all
 
 %% Initiate parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 start=[1 1];                % starting coordinates
-num_steps=800;              % number of steps
-D=0.000605085473694187;                 % diffusion constant ?m2/s             
+num_steps=300;              % number of steps
+D=0.01;                     % diffusion constant ?m2/s             
+segment=20;                 % Sm, segment length in frames
+n=100;                       % number of random walks
 
-
-dt=0.5;                     % time step
+dt=0.3;                     % time step
 dx=0.1;                     % pixel size
 step_size=sqrt(4*D*dt);     % D=(dx^2)/dt --> in ?m  
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Calculate random walk in loop
 
-%%%
-n=100;                              % number of random walks
-random_walks=zeros(num_steps,n*2);  % matrix 
-%%%
- j=1;
+random_walks=zeros(num_steps,n*2);  % generate matrix 
+
+j=1;
 
 for i=1:n;
 
@@ -122,9 +134,8 @@ clear msd msd2 pos frame
 end
 
 w=1;
-figure;
-for v=1:n;
-    
+figure('Position',[200 20 300 300],'name','MSD overlay all inteations')
+for v=1:n;   
     plot(msd_all(:,w+1),msd_all(:,w)); hold on;
     w=w+3;
 end
@@ -169,50 +180,51 @@ vx=[];
 vy=[];
 
 
-for i=1:max(frame)-30;    % for all frames
-    vx=find(frame == i);
+c=1;
+
+for i=1:max(frame)-segment;                       % for all frames
+    vx=find(frame == i);                     % find frame i
     
-    if isempty(vx)==1;                   % if frame does not exist, skip   
+    if isempty(vx)==1;                       % if frame does not exist, skip   
     else
         
-    c=1; 
-    for j=1:30;                                         % segment length
+     
+    for j=4:segment;                                           % segment length
           
-        vy=find(frame <= (i+j) & frame >= i );         % select segment
-        subset(:,1)=pos(vy);                           % define segment as subset
+        vy=find(frame <= (i+j) & frame >= i );          % select segment
+        subset(:,1)=pos(vy);                            % define segment as subset
         subset(:,2)=pos(vy,2);
         
         if length(vy)==1;   % if subset is only 1 frame --> distance is 0
                      R=0;
         else    
         
-            for k=2:length(subset);
-            
-                 d(k,1)=sqrt(((subset(k,1)-subset(1,1))^2)+((subset(k,2)-subset(1,2))^2));   
-                 R=max(d);
-        
+            for  k=2:length(subset);
+                 d(k,1)=sqrt(((subset(k,1)-subset(1,1))^2)+((subset(k,2)-subset(1,2))^2));    % calculate the distance to each point in subset from point i  
             end
-        
-                                                                % maximum distance within subset
-        prob(i:(i+j),c)=0.2048-2.5117*((D*j)./(R^2));               % probability within subset
+        R=max(d);                                                      % maximum distance within subset
+        prob(i:(i+j),c)=0.2048-2.5117*((D*j)./(R^2));                  % probability within subset
+%         prob(c,i:(i+j))=((D*j)./(R^2));
 
+%       prob(c,i:(i+j))=horzcat(prob(c,i:(i+j)),((D*j)./(R^2)));
+        c=c+1;  
         clear subset
         end
     
-    c=c+1;    
+%     c=c+1;    
         
     end
-    clear vx vy R d c;
+    clear vx vy R d;
     
     end
    
 end
 clear subset
 
-for l=1:length(prob)
+for l=1:length(frame)
     
-prob2(l,1)=l;
-prob2(l,2)=mean(nonzeros(prob(l,:))); % this is log omega
+prob2(l,1)=l;                           % frame
+prob2(l,2)=mean(nonzeros(prob(l,:)));   % this is psi
 
 end
   
@@ -229,7 +241,7 @@ end
 
 L=[];
 frames=1:length(conf_all);
-figure('Position',[200 20 900 300])
+figure('Position',[200 20 900 300],'name','Confinement parameters')
 h=gcf;
 set(h,'PaperOrientation','landscape');
 
@@ -250,38 +262,29 @@ for i=1:length(conf_all)
         
 end
 
-s1(:,j)=smooth(D*frames*dt,conf_all(:,j),0.1,'loess');
-s2(:,j)=smooth(frames*dt,10.^(conf_all(:,j)),0.1,'loess');
-s3(:,j)=smooth(frames*dt, L(:,j),0.1,'loess');
-
 integral(j,:)=sum(L(:,j)); % calculate integral
 
 subplot(1,3,1)
-% plot(D*prob2(:,1)*dt,prob2(:,2));hold on;
-% plot(D*frames*dt,s1(:,j),'-r');hold on;
-plot(frames*dt,s1(:,j));hold on;
+plot(frames*dt,conf_all(:,j));hold on;
 xlabel('time(s)','FontSize',12);
 ylabel('mean log(\psi)','FontSize',12);
 
 subplot(1,3,2)
-% plot(prob2(:,1)*dt,10.^(prob2(:,2)));hold on;
-plot(frames*dt,s2(:,j));hold on;
+plot(frames*dt,10.^(conf_all(:,j)));hold on;
 xlabel('time (s)','FontSize',12);
 ylabel('mean \psi','FontSize',12);
 
 subplot(1,3,3)
-plot(frames*dt, L(:,j)); hold on;
-plot(frames*dt, s3(:,j));hold on;   
+plot(frames*dt, L(:,j)); hold on;  
 xlabel('time (s)','FontSize',12);
-ylabel('probability level L','FontSize',12);
-
+ylabel('confinement index L','FontSize',12);
 
 end
 
-figure('Position',[10 200 300 300])
-h=gcf;
-set(h,'PaperOrientation','landscape');
-hist(integral,10);
-title('Hist of integral')
-xlabel('counts','FontSize',12);
-ylabel('integral','FontSize',12);
+% figure('Position',[10 200 300 300])
+% h=gcf;
+% set(h,'PaperOrientation','landscape');
+% hist(integral,10);
+% title('Hist of integral')
+% xlabel('counts','FontSize',12);
+% ylabel('integral','FontSize',12);

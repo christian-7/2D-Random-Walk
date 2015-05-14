@@ -20,7 +20,7 @@ clear all, clc, close all
 
 D=0.000605085473694187;                     % diffusion constant, mum2/s             
 t=1:1:1000;                                 % number of time steps for the simulation, seconds        
-R=0.3;                                        % radius of the confinement zone for simulation, mum
+R=1;                                        % radius of the confinement zone for simulation, mum
 
 start=[0 0];                 % starting coordinates
 num_steps=300;               % number of steps
@@ -37,26 +37,26 @@ segment=30;                 % Sm, segment length in frames
 
 omega=0.2048-2.5117*((D*t)./(R^2)); % from Simson paper log(psi)
 
-% figure('Position',[20 400 700 300],'name','Simulations according to Simson et al.')
-% h=gcf;
-% set(h,'PaperOrientation','landscape');
+figure('Position',[20 400 700 300],'name','Simulations according to Simson et al.')
+h=gcf;
+set(h,'PaperOrientation','landscape');
 
-% subplot(1,2,1)
-% plot(t,10.^omega); hold on;
-% % title('Probability to stay in confined region with radius R (Simson et al, 1995)')
-% xlabel('time (s)','FontSize',12);
-% ylabel('\psi (R,t)','FontSize',12);
-% box on;
-% 
-% subplot(1,2,2)
-% plot(D*t/R^2,omega);hold on;
-% xlabel('Dt/R^2','FontSize',12);
-% ylabel('log(\psi)','FontSize',12);
-% box on;
-% 
-% % figure('Position',[800 400 300 300],'name','Simulations according to Simson et al.')
-% % h=gcf;
-% % set(h,'PaperOrientation','landscape');
+subplot(1,2,1)
+plot(t,10.^omega); hold on;
+% title('Probability to stay in confined region with radius R (Simson et al, 1995)')
+xlabel('time (s)','FontSize',12);
+ylabel('\psi (R,t)','FontSize',12);
+box on;
+
+subplot(1,2,2)
+plot(D*t/R^2,omega);hold on;
+xlabel('Dt/R^2','FontSize',12);
+ylabel('log(\psi)','FontSize',12);
+box on;
+
+figure('Position',[800 400 300 300],'name','Simulations according to Simson et al.')
+h=gcf;
+set(h,'PaperOrientation','landscape');
 
 plot(t,omega*(-1)-1);hold on;
 xlabel('t (s)','FontSize',12);
