@@ -9,7 +9,7 @@
 % Date:     04/05/15
 % Author:   Christian Sieben
 
-clear all, clc, close all
+clear, clc, close all
 
 %% Initiate parameters
 
@@ -17,11 +17,11 @@ clear all, clc, close all
 
 start=[1 1];                                % starting coordinates
 num_steps=300;                              % number of steps
-D=0.046;                                     % diffusion constant ?m2/s             
-segment=20;                                 % Sm, segment length in frames
+D=0.044;                                     % diffusion constant ?m2/s             
+segment=30;                                 % Sm, segment length in frames
 
 
-dt=0.3;                     % time step
+dt=0.5;                     % time step
 dx=1;                       % pixel size
 step_size=sqrt(4*D*dt);     % D=(dx^2)/dt --> in ?m  
 

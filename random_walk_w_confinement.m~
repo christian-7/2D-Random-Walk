@@ -17,12 +17,12 @@ clear all, close all, clc
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 D=0.044;                     % diffusion constant, ?m2/s 
-D_conf=D/20;                                 % diffusion constant in confined areas, ?m2/s
+D_conf=D/10;                                 % diffusion constant in confined areas, ?m2/s
 
 start=[0 0];                                % starting coordinates
-num_steps=500;                              % number of steps
+num_steps=300;                              % number of steps
                     
-dt=0.5;                                     % time step, seconds
+dt=0.3;                                     % time step, seconds
 dx=1;                                       % pixel size, ?m
 step_size=sqrt(4*D*dt);                     % step size according to D
 step_size_conf=sqrt(4*D_conf*dt);           % step size according to D_conf
@@ -32,7 +32,7 @@ segment=30;                                 % Sm, segment length in frames
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % define confined areas as circles with radius and center position
 
-radius=0.1;
+radius=0.07;
 center=[1 0.5];
 center2=[-1 0.5];
 center3=[0 -0.6];

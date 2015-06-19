@@ -18,9 +18,9 @@ clear all, clc, close all
 
 start=[1 1];                % starting coordinates
 num_steps=300;              % number of steps
-D=0.01;                     % diffusion constant ?m2/s             
+D=0.044;                     % diffusion constant ?m2/s             
 segment=20;                 % Sm, segment length in frames
-n=100;                       % number of random walks
+n=20;                      % number of random walks
 
 dt=0.3;                     % time step
 dx=0.1;                     % pixel size

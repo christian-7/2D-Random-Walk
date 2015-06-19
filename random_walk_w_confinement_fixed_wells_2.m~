@@ -9,37 +9,39 @@
 % Date:     30/04/15
 % Author:   Christian Sieben
 
-clear all, %close all, clc
+%clear all, close all, clc
 
 %% Initialize parameters for random walk and add circles
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-D=0.01;                                      % diffusion constant, ?m2/s 
-D_conf=D/50;                                 % diffusion constant in confined areas, ?m2/s
-dwell=40;
+D=0.044;                                      % diffusion constant, ?m2/s 
+ratio=5;
+D_conf=D/ratio;                                  % diffusion constant in confined areas, ?m2/s
+% dwell=20;                                     % time the particle stays in confined area
 
 start=[0 0];                                % starting coordinates
-num_steps=300;                              % number of steps
-                    
+num_steps=500;                              % number of steps   
+
 dt=0.5;                                     % time step, seconds
 dx=1;                                       % pixel size, ?m
 step_size=sqrt(4*D*dt);                     % step size according to D
 step_size_conf=sqrt(4*D_conf*dt);           % step size according to D_conf
 
-segment=30;                                 % Sm, segment length in frames
+segment=20;                                 % Sm, segment length in frames
+threshold=5;                               % threshold confinement index
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % define confined areas as circles with radius and center position
 
- radius=0.07;
+radius=0.4;
 % center=[1 0.5];
 % center2=[-1 0.5];
 % center3=[0 -0.6];
 
-minAxis=-2.5;
-maxAxis=2.5;
+minAxis=-5.5;
+maxAxis=5.5;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -56,7 +58,14 @@ angle = (b-a).*rand(num_steps,1) + a;
 
 for k=2:num_steps;
     
-    if k>=150 & k<=150+dwell %| k>=150 & k<=150+dwell
+    if k>=150 %& k<=150+dwell %| k>=150 & k<=150+dwell
+        
+    center=[pos(150,1) pos(150,2)];
+    
+   
+      if  sqrt(((pos(k-1,1)-center(1,1))^2)+((pos(k-1,2)-center(1,2))^2)) <= radius %| ...
+%         sqrt(((pos(k-1,1)-center2(1,1))^2)+((pos(k-1,2)-center2(1,2))^2)) <= radius | ...
+%         sqrt(((pos(k-1,1)-center3(1,1))^2)+((pos(k-1,2)-center3(1,2))^2)) <= radius;
         
     pos(k,1)=(pos(k-1,1))+sin(angle(k))*step_size_conf;
     pos(k,2)=(pos(k-1,2))+cos(angle(k))*step_size_conf;
@@ -64,7 +73,21 @@ for k=2:num_steps;
     pos(k,4)=step_size_conf;
     
     else
+        
+    pos(k,1)=(pos(k-1,1))+sin(angle(k))*step_size;
+    pos(k,2)=(pos(k-1,2))+cos(angle(k))*step_size;
+    pos(k,3)=k*dt; % time in seconds
+    pos(k,4)=step_size;
     
+    end
+        
+%     pos(k,1)=(pos(k-1,1))+sin(angle(k))*step_size_conf;
+%     pos(k,2)=(pos(k-1,2))+cos(angle(k))*step_size_conf;
+%     pos(k,3)=k*dt;
+%     pos(k,4)=step_size_conf;
+    
+    else
+        
     pos(k,1)=(pos(k-1,1))+sin(angle(k))*step_size;
     pos(k,2)=(pos(k-1,2))+cos(angle(k))*step_size;
     pos(k,3)=k*dt; % time in seconds
@@ -72,48 +95,9 @@ for k=2:num_steps;
     
     end
     
+    
+    
 end
-        
-%         center=[(pos(k,1)+radius),(pos(k,2)+radius)]
-%     
-%     if  sqrt(((pos(k-1,1)-center(1,1))^2)+((pos(k-1,2)-center(1,2))^2)) <= radius %| ...
-% %         sqrt(((pos(k-1,1)-center2(1,1))^2)+((pos(k-1,2)-center2(1,2))^2)) <= radius | ...
-% %         sqrt(((pos(k-1,1)-center3(1,1))^2)+((pos(k-1,2)-center3(1,2))^2)) <= radius;
-%         
-%     pos(k,1)=(pos(k-1,1))+sin(angle(k))*step_size_conf;
-%     pos(k,2)=(pos(k-1,2))+cos(angle(k))*step_size_conf;
-%     pos(k,3)=k*dt;
-%     pos(k,4)=step_size_conf;
-%     
-%     else
-%         
-%     pos(k,1)=(pos(k-1,1))+sin(angle(k))*step_size;
-%     pos(k,2)=(pos(k-1,2))+cos(angle(k))*step_size;
-%     pos(k,3)=k*dt; % time in seconds
-%     pos(k,4)=step_size;
-% 
-%     end
-%     end
-%     
-%     end
-
-
-
-% figure('Position',[0 400 400 300],'name','XY scatter trajectory')
-% line(pos(:,1)*dx,pos(:,2)*dx);hold on;
-% scatter(pos(:,1)*dx,pos(:,2)*dx,3,pos(:,3));hold on;
-% plot(pos(1,1)*dx,pos(1,2)*dx,'*b','MarkerSize',12);hold on;
-% text(pos(1,1)*dx,pos(1,2)*dx, 'Start');
-% plot(pos(length(pos),1)*dx,pos(length(pos),2)*dx,'+b','MarkerSize',12);hold on;
-% text(pos(length(pos),1)*dx,pos(length(pos),2)*dx,'End');hold on;
-% % well1 = viscircles(center, radius);
-% % well2 = viscircles(center2, radius);
-% % well3 = viscircles(center3, radius);
-% axis([minAxis maxAxis minAxis maxAxis])
-% title('XY scatter trajectory');
-% xlabel('x (\mum)','FontSize',12);
-% ylabel('y (\mum)','FontSize',12);
-% box on;
 
 %% Calculate confinement
 
@@ -198,45 +182,15 @@ L(i,2)=i;
     
 end
 
-% s1=smooth(D*prob2(:,1)*dt,prob2(:,2),0.05,'loess');
-% s2=smooth(prob2(:,1)*dt,10.^(prob2(:,2)),0.05,'loess');
-% s3=smooth(L(:,2)*dt, L(:,1),0.05,'loess');
-
-
-% figure('Position',[400 400 900 300], 'name','Probability psi, log(psi), confinement index L')
-% h=gcf;
-% set(h,'PaperOrientation','landscape');
+% %% Figures to save
 % 
-% subplot(1,3,1)
-% % plot(D*prob2(:,1)*dt,prob2(:,2));hold on;
-% % plot(D*prob2(:,1)*dt,s1,'-r');
-% plot(prob2(:,1)*dt,prob2(:,2));hold on;
-% % plot(prob2(:,1)*dt,s1,'-r');
-% xlabel('time (s)','FontSize',12);
-% ylabel('mean log(\psi)','FontSize',12);
-% 
-% subplot(1,3,2)
-% plot(prob2(:,1)*dt,10.^(prob2(:,2)));hold on;
-% % plot(prob2(:,1)*dt,s2,'-r');
-% xlabel('time (s)','FontSize',12);
-% ylabel('mean \psi','FontSize',12);
-% 
-% subplot(1,3,3)
-% plot(L(:,2)*dt, L(:,1)); hold on;
+% % figure('Position',[200 800 300 300], 'name','confinement index L')
+% % plot(L(:,2)*dt, L(:,1)); hold on;
 % % plot(L(:,2)*dt, s3,'-r');       
-% xlabel('time (s)','FontSize',12);
-% ylabel('probability level L','FontSize',12);
-
-%% Figures to save
-
-% figure('Position',[200 800 300 300], 'name','confinement index L')
-
-plot(L(:,2)*dt, L(:,1)); hold on;
-% plot(L(:,2)*dt, s3,'-r');       
-xlabel('time (s)','FontSize',12);
-ylabel('confinement index L','FontSize',12);
-
-
+% % xlabel('time (s)','FontSize',12);
+% % ylabel('confinement index L','FontSize',12);
+% 
+% 
 % figure('Position',[600 800 600 300], 'name','XY scatter and confinement index L')
 % h=gcf;
 % set(h,'PaperOrientation','landscape');
@@ -248,7 +202,7 @@ ylabel('confinement index L','FontSize',12);
 % text(pos(1,1)*dx,pos(1,2)*dx, 'Start');
 % plot(pos(length(pos),1)*dx,pos(length(pos),2)*dx,'+b','MarkerSize',12);hold on;
 % text(pos(length(pos),1)*dx,pos(length(pos),2)*dx,'End');hold on;
-% % well1 = viscircles(center, radius);
+% well1 = viscircles(center, radius);
 % % well2 = viscircles(center2, radius);
 % % well3 = viscircles(center3, radius);
 % axis([minAxis maxAxis minAxis maxAxis])
@@ -262,13 +216,14 @@ ylabel('confinement index L','FontSize',12);
 % subplot(1,2,2)
 % plot(L(:,2)*dt, L(:,1)); hold on;
 % scatter(L(:,2)*dt, L(:,1),15,pos(:,3),'filled')
+% plot([1,num_steps*dt],[threshold threshold], 'r-')
 % % plot(L(:,2)*dt, s3,'-r');       
 % xlabel('time (s)','FontSize',12);
 % ylabel('confinement index L','FontSize',12);
 % title('Confinement index L');
-
-%% 
-% figure('Position',[500 800 500 600], 'name','Compare time with displacement and confinement')
+% 
+% % 
+% figure('Position',[100 800 500 600], 'name','Compare time with displacement and confinement')
 % h=gcf;
 % set(h,'PaperOrientation','portrait');
 % 
@@ -312,3 +267,39 @@ ylabel('confinement index L','FontSize',12);
 % xlabel('time (s)','FontSize',12);
 % ylabel('distance from origin (\mu m)','FontSize',12);
 % box on;
+
+%% Identify Wells and measure dwell time
+
+dwell=find(L(:,1) > threshold);
+
+dwell=dwell-min(dwell)+1;
+
+wells=[];
+dwell_time=[];
+p=1;
+
+for o=1:length(dwell)-1;
+    
+    if dwell(o+1,1)==dwell(o,1)+1;
+    
+    wells(o,p)=dwell(o,1);
+
+    else
+        
+    p=p+1;
+    wells(o,p)=dwell(o,1);
+
+    end
+    
+end
+
+[m,n]=size(wells);
+
+for q=1:n;
+    
+dwell_time(q,1)=length(nonzeros(wells(:,q)))
+
+end
+
+% figure
+% hist(dwell_time)
