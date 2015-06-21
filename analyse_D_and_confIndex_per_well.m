@@ -111,7 +111,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 clear all; close all; clc
-load('/Users/Christian/Documents/Arbeit/Manuscripts/Receptor_organization/trajectories/data/well_analysis/allMSD.mat');
+load('/Users/Christian/Documents/Arbeit/Manuscripts/Receptor_organization/trajectories/data/well_analysis/allMSD_2.mat');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -124,9 +124,9 @@ figure('Position',[500 800 600 300], 'name','MSD per well analysis using linear 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-for r=1:15;
+for r=1:23;
     
-    if r==10 | r==11;
+    if r==1 | r==3 | r==6 | r==15 | r==16 | r==18;
         
     else
                 
